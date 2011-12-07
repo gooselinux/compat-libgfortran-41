@@ -1,0 +1,23 @@
+--- gcc/gthr-default.h.jj	2007-12-14 16:24:42.515800719 +0100
++++ gcc/gthr-default.h	2007-11-24 23:05:01.000000000 +0100
+@@ -0,0 +1 @@
++#include "gthr-posix.h"
+--- gcc/gthr-posix.h.jj	2007-07-04 20:46:26.000000000 +0200
++++ gcc/gthr-posix.h	2007-12-20 16:04:49.000000000 +0100
+@@ -62,9 +62,15 @@ typedef pthread_mutex_t __gthread_recurs
+ # ifndef __gthrw_pragma
+ #  define __gthrw_pragma(pragma)
+ # endif
+-# define __gthrw2(name,name2,type) \
++# if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
++#  define __gthrw2(name,name2,type) \
++  static __typeof(type) name __attribute__ ((__weakref__(#name2))); \
++  __gthrw_pragma(weak type)
++# else
++#  define __gthrw2(name,name2,type) \
+   extern __typeof(type) name __attribute__ ((__weakref__(#name2))); \
+   __gthrw_pragma(weak type)
++# endif
+ # define __gthrw_(name) __gthrw_ ## name
+ #else
+ # define __gthrw2(name,name2,type)
